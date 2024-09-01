@@ -139,3 +139,42 @@ The statement COPY --chown=app:app package\*.json . in a Dockerfile performs the
 - **`.` :** Specifies the destination directory within the container's filesystem (typically the current WORKDIR).
 
 > This command copies all package\*.json files from the host into the container and ensures that these files are owned by the app user and group, which can help maintain proper file permissions and security in the container.
+
+<br/>
+
+## 05 - How to use `chown` option
+
+There are two ways:
+
+1. As an inline instruction (Best Ways)
+2. As a seperate lines of instructions
+
+### As an inline instruction
+
+```dockerfile
+# Use COPY --chown to set ownership during the copy process
+COPY --chown=appuser:appgroup package*.json ./
+```
+
+### As a seperate lines of instructions
+
+```dockerfile
+# Ensure you're running as root
+USER root
+
+# Change ownership of specific files
+RUN chown appuser:appgroup /app/package.json /app/package-lock.json
+
+# Optionally, switch back to the non-root user if needed
+USER appuser
+```
+
+<br/>
+
+## 06 - Adjust file permissions instead of ownership
+
+```dockerfile
+# Adjust file permissions instead of ownership
+RUN chmod 644 /app/package.json /app/package-lock.json
+
+```
