@@ -106,3 +106,36 @@ CMD ["npm", "start"]
 ```
 
 <br/>
+
+## 02 - Why creating an user define top of the Dockerfile?
+
+When creating an user, file system will be updated. We want to cache that process in one layer, otherwise user will create & written configurations in file system again & again.
+
+<br/>
+
+## 03 - Why does COPY command in Dockerfile result in files owned by root user?
+
+Even though you've set a non-root user with USER app, the COPY command still runs with the root user's permissions. Docker applies the USER instruction to commands that come after it, but COPY and ADD are executed with the default root user unless explicitly specified otherwise.
+
+To ensure the files are owned by the app user, you should use the --chown option with COPY, like this:
+
+```
+COPY --chown=app:app package*.json .
+```
+
+> The `--chown=app:app` option in the COPY command sets the ownership of the copied files and directories to the user app and group app, ensuring that the files are owned by app instead of the default root user.
+
+The correct order is `--chown=user:group`. For example, --chown=app:app sets the user to app and the group to app.
+
+<br/>
+
+## 04 - Explain `COPY --chown=app:app package*.json .`
+
+The statement COPY --chown=app:app package\*.json . in a Dockerfile performs the following actions:
+
+- **`COPY`:** Copies files from the host machine into the Docker image.
+- **`--chown=app`**: Sets the ownership of the copied files to the user app and group app.
+- **`package.json\*`:** This is a pattern that matches and copies any file in the build context with a name starting with "package" and ending with ".json" (e.g., package.json and package-lock.json).
+- **`.` :** Specifies the destination directory within the container's filesystem (typically the current WORKDIR).
+
+> This command copies all package\*.json files from the host into the container and ensures that these files are owned by the app user and group, which can help maintain proper file permissions and security in the container.
